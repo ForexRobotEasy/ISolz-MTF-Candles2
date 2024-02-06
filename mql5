@@ -1,0 +1,83 @@
+
+//+------------------------------------------------------------------+
+//|                                              ISolz MTF Candles2  |
+//|                             https://www.forexroboteasy.com        |
+//|                                       Developed by Forex Robot Easy Team |
+//+------------------------------------------------------------------+
+#property strict
+
+// Global variables
+int selectedCandle; // Selected candle index
+string[] candleTimeFrames; // Available candle time frames
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Initialize variables
+    selectedCandle = 0;
+    
+    // Populate candle time frames
+    candleTimeFrames[0] = 'M1';
+    candleTimeFrames[1] = 'M5';
+    candleTimeFrames[2] = 'M15';
+    candleTimeFrames[3] = 'M30';
+    candleTimeFrames[4] = 'H1';
+    candleTimeFrames[5] = 'H4';
+    candleTimeFrames[6] = 'D1';
+    
+    // Set indicator buffers
+    SetIndexStyle(0, DRAW_COLOR_LINE);
+    SetIndexBuffer(0, High);
+    SetIndexStyle(1, DRAW_COLOR_LINE);
+    SetIndexBuffer(1, Low);
+    
+    return INIT_SUCCEEDED;
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total, const int prev_calculated, const datetime &time[], const double &open[], const double &high[], const double &low[], const double &close[], const long &tick_volume[], const long &volume[], const int &spread[])
+{
+    // Select the desired candle timeframe
+    int selectedTimeFrame = selectedCandle;
+    
+    // Calculate the index of the selected candle in the rates array
+    int selectedCandleIndex = rates_total - 1 - selectedTimeFrame;
+    
+    // Set the indicator values for the selected candle
+    High[0] = high[selectedCandleIndex];
+    Low[1] = low[selectedCandleIndex];
+    
+    // Return the calculated bars
+    return rates_total;
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator input parameters function                       |
+//+------------------------------------------------------------------+
+void OnParameters()
+{
+    // Display input parameters
+    Print('Available Candle Time Frames:');
+    for (int i = 0; i < ArraySize(candleTimeFrames); i++)
+    {
+        Print('[' + i + '] ' + candleTimeFrames[i]);
+    }
+    
+    // Prompt user for the desired candle index
+    Print('Select the desired candle index (0-' + (ArraySize(candleTimeFrames)-1) + '):');
+    selectedCandle = InputInteger('Selected Candle Index:', 0, 0, ArraySize(candleTimeFrames)-1);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator deinitialization function                       |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+    // Clean up resources
+    selectedCandle = 0;
+    ArrayFree(candleTimeFrames);
+}
